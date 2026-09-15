@@ -2,20 +2,8 @@
 #define AETHERIS_SHADOW
 
 
-// ===================================
-// Aetheris Shadow System
-// ===================================
-
-
 #include "/core/common.glsl"
-
-
-
-uniform sampler2D shadowtex0;
-
-
-uniform mat4 shadowModelView;
-uniform mat4 shadowProjection;
+#include "/core/uniforms.glsl"
 
 
 

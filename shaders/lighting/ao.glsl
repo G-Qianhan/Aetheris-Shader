@@ -2,33 +2,11 @@
 #define AETHERIS_AO
 
 
-// ===================================
-// Aetheris Shader
-// Screen Space Ambient Occlusion
-// ===================================
-
-
 #include "/core/common.glsl"
+#include "/core/uniforms.glsl"
 
 
 
-
-// Iris depth
-
-uniform sampler2D depthtex0;
-
-
-
-// 屏幕尺寸
-
-uniform vec2 viewSize;
-
-
-
-
-// -----------------------------------
-// AO Sample
-// -----------------------------------
 
 float sampleAO(
     vec2 uv,
@@ -48,7 +26,6 @@ float sampleAO(
         sampleDepth;
 
 
-
     return clamp(
         difference * 5.0,
         0.0,
@@ -59,11 +36,6 @@ float sampleAO(
 
 
 
-
-
-// -----------------------------------
-// SSAO
-// -----------------------------------
 
 float calculateAO(
     vec2 uv
@@ -81,10 +53,7 @@ float calculateAO(
     float ao = 0.0;
 
 
-
-    float radius =
-        3.0;
-
+    float radius = 3.0;
 
 
     vec2 texel =
@@ -120,12 +89,9 @@ float calculateAO(
     ao /= 4.0;
 
 
-
     return 1.0 - ao;
 
 }
-
-
 
 
 

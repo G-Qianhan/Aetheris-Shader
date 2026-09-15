@@ -2,20 +2,8 @@
 #define AETHERIS_SUNLIGHT
 
 
-// ===================================
-// Aetheris Sun System
-// ===================================
-
-
-
 #include "/core/common.glsl"
-
-
-
-// Minecraft Iris 提供太阳方向
-
-uniform vec3 sunPosition;
-
+#include "/core/uniforms.glsl"
 
 
 
@@ -27,8 +15,6 @@ vec3 getSunDirection()
     );
 
 }
-
-
 
 
 
@@ -45,15 +31,12 @@ vec3 getSunColor()
 
 
 
-
-
 float getSunIntensity()
 {
 
     return 1.0;
 
 }
-
 
 
 

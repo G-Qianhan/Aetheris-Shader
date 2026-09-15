@@ -50,7 +50,7 @@ void main()
 
 
     vec3 worldPosition =
-        reconstructWorldPosition(
+        getWorldPosition(
             texcoord,
             depth
         );

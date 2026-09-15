@@ -2,21 +2,16 @@
 #define AETHERIS_GBUFFER
 
 
+#include "/core/uniforms.glsl"
+
+
 // ===================================
-// Aetheris GBuffer Interface
+// Aetheris GBuffer Reader
 // ===================================
 
 
-uniform sampler2D colortex0;
-uniform sampler2D colortex1;
-uniform sampler2D depthtex0;
 
-
-
-
-vec3 getAlbedo(
-    vec2 uv
-)
+vec3 getAlbedo(vec2 uv)
 {
 
     return texture2D(
@@ -30,21 +25,18 @@ vec3 getAlbedo(
 
 
 
-vec3 getNormal(
-    vec2 uv
-)
+vec3 getNormal(vec2 uv)
 {
 
-    vec3 normal =
+    vec3 n =
         texture2D(
             colortex1,
             uv
         ).rgb;
 
 
-
     return normalize(
-        normal * 2.0 - 1.0
+        n * 2.0 - 1.0
     );
 
 }
@@ -53,9 +45,7 @@ vec3 getNormal(
 
 
 
-float getDepth(
-    vec2 uv
-)
+float getDepth(vec2 uv)
 {
 
     return texture2D(
@@ -64,6 +54,26 @@ float getDepth(
     ).r;
 
 }
+
+
+
+
+
+float isSky(vec2 uv)
+{
+
+    float depth =
+        getDepth(uv);
+
+
+    return step(
+        0.99999,
+        depth
+    );
+
+}
+
+
 
 
 
