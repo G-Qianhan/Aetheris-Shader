@@ -1,0 +1,13 @@
+# Minecraft
+*.log
+
+# IDE
+.vscode/
+
+# Temporary
+temp/
+cache/
+
+# Build
+build/
+dist/
