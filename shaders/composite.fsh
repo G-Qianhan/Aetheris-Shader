@@ -1,12 +1,14 @@
 #version 120
 
+/*
+    Aetheris Shader
+    Composite Pipeline
+*/
+
+
 uniform sampler2D colortex0;
 
 varying vec2 texcoord;
-
-
-#include "/core/config.glsl"
-#include "/post/color_grade.glsl"
 
 
 void main()
@@ -17,10 +19,6 @@ void main()
         colortex0,
         texcoord
     ).rgb;
-
-
-    color =
-    AetherisColorGrade(color);
 
 
     gl_FragData[0]
