@@ -1,26 +1,60 @@
-/*
-    Aetheris Shader
-    Sunlight System
-*/
+#ifndef AETHERIS_SUNLIGHT
+#define AETHERIS_SUNLIGHT
 
 
-vec3 AetherisSunLight(
-    vec3 color,
-    vec3 normal,
-    vec3 lightDirection,
-    vec3 lightColor
-)
+// ===================================
+// Aetheris Sun System
+// ===================================
+
+
+
+#include "/core/common.glsl"
+
+
+
+// Minecraft Iris 提供太阳方向
+
+uniform vec3 sunPosition;
+
+
+
+
+vec3 getSunDirection()
 {
 
-    float diffuse =
-        max(
-            dot(normal, lightDirection),
-            0.0
-        );
-
-
-    return color
-        * lightColor
-        * diffuse;
+    return safeNormalize(
+        sunPosition
+    );
 
 }
+
+
+
+
+
+vec3 getSunColor()
+{
+
+    return vec3(
+        1.0,
+        0.92,
+        0.78
+    );
+
+}
+
+
+
+
+
+float getSunIntensity()
+{
+
+    return 1.0;
+
+}
+
+
+
+
+#endif
