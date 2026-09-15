@@ -1,16 +1,35 @@
-vec3 AetherisColorGrade(vec3 color)
+#ifndef AETHERIS_COLOR_GRADE
+#define AETHERIS_COLOR_GRADE
+
+
+
+// ===================================
+// Aetheris Cinematic Color
+// ===================================
+
+
+vec3 AER_ColorGrade(
+    vec3 color
+)
 {
 
-    // Exposure
-    color *= AE_EXPOSURE;
 
+    // slightly cinematic contrast
 
-    // Contrast
     color =
-        (color - 0.5)
-        * AE_CONTRAST
-        + 0.5;
+        pow(
+            color,
+            vec3(
+                0.95
+            )
+        );
+
 
 
     return color;
+
 }
+
+
+
+#endif

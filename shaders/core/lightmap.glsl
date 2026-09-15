@@ -5,58 +5,65 @@
 #include "/core/common.glsl"
 
 
-varying vec2 lightmapCoord;
+
+// ===================================
+// Minecraft Light System
+// ===================================
 
 
 
-float getSkyLight()
+vec3 AER_GetBlockLight(
+    float value
+)
 {
-    return lightmapCoord.y;
+
+    return vec3(
+        value * 1.0,
+        value * 0.55,
+        value * 0.25
+    );
+
 }
 
 
 
-float getBlockLight()
+
+
+vec3 AER_GetSkyLight(
+    float value
+)
 {
-    return lightmapCoord.x;
+
+    return vec3(
+        value * 0.35,
+        value * 0.45,
+        value * 0.75
+    );
+
 }
 
 
 
-vec3 getMinecraftLight()
+
+
+vec3 AER_CalculateMinecraftLight(
+    vec2 lightmap
+)
 {
 
-    float sky =
-        getSkyLight();
-
-
-    float block =
-        getBlockLight();
-
-
-
-    vec3 skyColor =
-        vec3(
-            0.45,
-            0.55,
-            0.75
+    vec3 block =
+        AER_GetBlockLight(
+            lightmap.x
         );
 
 
-
-    vec3 blockColor =
-        vec3(
-            1.0,
-            0.55,
-            0.25
+    vec3 sky =
+        AER_GetSkyLight(
+            lightmap.y
         );
 
 
-
-    return
-        sky * skyColor
-        +
-        block * blockColor;
+    return block + sky;
 
 }
 

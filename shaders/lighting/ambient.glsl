@@ -5,27 +5,40 @@
 #include "/core/common.glsl"
 
 
-vec3 getAmbientColor()
+
+/*
+    Sky ambient
+
+    后续接:
+    sky scattering
+    weather
+    time
+*/
+
+
+
+vec3 AER_GetAmbientSky()
 {
 
     return vec3(
-        0.08,
         0.10,
-        0.15
+        0.13,
+        0.20
     );
 
 }
 
 
 
-vec3 calculateAmbient(
+
+vec3 AER_CalculateAmbient(
     vec3 albedo
 )
 {
 
     return
         albedo *
-        getAmbientColor();
+        AER_GetAmbientSky();
 
 }
 

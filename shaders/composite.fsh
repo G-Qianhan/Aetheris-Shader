@@ -2,22 +2,37 @@
 
 
 // ===================================
-// Aetheris Shader
-// Deferred Lighting Composite
+// Aetheris Composite Renderer
+// Full Deferred Pipeline
 // ===================================
 
 
 #include "/core/common.glsl"
 #include "/core/uniforms.glsl"
+
 #include "/core/gbuffer.glsl"
 #include "/core/camera.glsl"
+#include "/core/lightmap.glsl"
 
 
-#include "/lighting/direct_light.glsl"
+
 #include "/lighting/sunlight.glsl"
+#include "/lighting/direct_light.glsl"
 #include "/lighting/ambient.glsl"
 #include "/lighting/shadow.glsl"
-#include "/lighting/ao.glsl"
+
+
+
+#include "/material/material.glsl"
+#include "/material/material_decode.glsl"
+#include "/material/emission.glsl"
+
+
+
+#include "/atmosphere/sky.glsl"
+#include "/atmosphere/fog.glsl"
+#include "/atmosphere/scattering.glsl"
+#include "/atmosphere/volumetric.glsl"
 
 
 
@@ -25,47 +40,100 @@ varying vec2 texcoord;
 
 
 
-
 void main()
 {
 
-    // ==============================
-    // GBuffer Data
-    // ==============================
+
+    // =================================
+    // Read GBuffer
+    // =================================
 
 
     vec3 albedo =
-        getAlbedo(
+        AER_GetAlbedo(
             texcoord
         );
+
 
 
     vec3 normal =
-        getNormal(
+        AER_GetNormal(
             texcoord
         );
+
+
+
+    vec2 lightmap =
+        AER_GetLightmap(
+            texcoord
+        );
+
 
 
     float depth =
-        getDepth(
+        AER_GetDepth(
             texcoord
         );
 
 
 
-    // ==============================
-    // Sky Pass Protection
-    // ==============================
+
+
+    vec3 viewRay =
+        AER_GetViewRay(
+            texcoord
+        );
+
+
+
+    vec3 sunDirection =
+        AER_GetSunDirection();
+
+
+
+
+
+    // =================================
+    // Sky
+    // =================================
 
 
     if(depth >= 0.99999)
     {
 
-        gl_FragData[0] =
+
+        vec3 sky =
+            AER_RenderSky(
+                viewRay,
+                sunDirection,
+                frameTimeCounter
+            );
+
+
+
+        sky +=
+            AER_Rayleigh(
+                viewRay,
+                sunDirection
+            );
+
+
+
+        sky +=
+            AER_VolumetricLight(
+                viewRay,
+                sunDirection
+            );
+
+
+
+        gl_FragData[0]
+            =
             vec4(
-                albedo,
+                sky,
                 1.0
             );
+
 
         return;
 
@@ -74,78 +142,22 @@ void main()
 
 
 
-    // ==============================
-    // Position Reconstruction
-    // ==============================
+
+    // =================================
+    // World Position
+    // =================================
 
 
     vec3 worldPosition =
-        getWorldPosition(
-            texcoord,
-            depth
+        AER_GetWorldPosition(
+            texcoord
         );
 
 
 
     vec3 viewDirection =
-        AER_SafeNormalize(
-            -worldPosition
-        );
-
-
-
-
-
-    // ==============================
-    // Sun Lighting
-    // ==============================
-
-
-    vec3 sunDirection =
-        getSunDirection();
-
-
-
-    vec3 sunColor =
-        getSunColor();
-
-
-
-    vec3 directLight =
-        calculateDirectLight(
-            albedo,
-            normal,
-            viewDirection,
-            sunDirection,
-            sunColor,
-            0.8
-        );
-
-
-
-
-
-    // ==============================
-    // Ambient
-    // ==============================
-
-
-    vec3 ambientLight =
-        calculateAmbient(
-            albedo
-        );
-
-
-
-
-
-    // ==============================
-    // Shadow
-    // ==============================
-
-
-    float shadow =
-        calculateShadow(
+        AER_Normalize(
+            cameraPosition -
             worldPosition
         );
 
@@ -153,90 +165,180 @@ void main()
 
 
 
-    // ==============================
-    // Minecraft Lightmap
-    // ==============================
+    // =================================
+    // Material
+    // =================================
 
 
-    vec2 lightmap =
-        getLightmap(
+    int materialID =
+        AER_GetMaterialID(
             texcoord
         );
+
+
+
+    AER_Surface surface =
+        AER_DecodeMaterial(
+            materialID,
+            albedo
+        );
+
+
+
+
+
+    // =================================
+    // Direct PBR Light
+    // =================================
+
+
+    vec3 sunColor =
+        AER_GetSunColor();
+
+
+
+    vec3 direct =
+        AER_CalculateDirectLight(
+            surface,
+            normal,
+            viewDirection,
+            sunDirection,
+            sunColor
+        );
+
+
+
+
+
+    // =================================
+    // Shadow
+    // =================================
+
+
+    float shadow =
+        AER_CalculateShadow(
+            worldPosition
+        );
+
+
+
+
+
+    // =================================
+    // Ambient
+    // =================================
+
+
+    vec3 ambient =
+        AER_CalculateAmbient(
+            surface.albedo
+        );
+
+
+
+
+
+    // =================================
+    // Minecraft Light
+    // =================================
 
 
     vec3 blockLight =
-        vec3(
-            lightmap.x,
-            lightmap.x * 0.75,
-            lightmap.x * 0.45
-        );
-
-
-    vec3 skyLight =
-        vec3(
-            lightmap.y * 0.45,
-            lightmap.y * 0.55,
-            lightmap.y * 0.75
-        );
-
-
-
-    vec3 minecraftLight =
-        blockLight +
-        skyLight;
-
-
-
-
-
-    // ==============================
-    // Ambient Occlusion
-    // ==============================
-
-
-    float ao =
-        calculateAO(
-            texcoord
+        AER_CalculateMinecraftLight(
+            lightmap
         );
 
 
 
 
 
-    // ==============================
-    // Final Lighting Combine
-    // ==============================
+    // =================================
+    // Emission
+    // =================================
+
+
+    vec3 emission =
+        AER_EmissionColor(
+            materialID,
+            surface.albedo
+        );
+
+
+
+
+
+    // =================================
+    // Combine HDR
+    // =================================
 
 
     vec3 color =
-        ambientLight
+        ambient
         +
-        directLight * shadow
+        direct * shadow
         +
-        minecraftLight;
+        blockLight
+        +
+        emission;
 
 
 
-    color *= ao;
+
+
+    // =================================
+    // Atmosphere Fog
+    // =================================
+
+
+    float distance =
+        length(
+            cameraPosition -
+            worldPosition
+        );
 
 
 
-    // 防止过暗
+    vec3 fogColor =
+        AER_BaseSky(
+            viewDirection
+        );
+
+
+
+    color =
+        AER_ApplyFog(
+            color,
+            fogColor,
+            distance
+        );
+
+
+
+
+
+    // =================================
+    // Clamp
+    // =================================
+
 
     color =
         max(
             color,
-            vec3(0.001)
+            vec3(
+                0.001
+            )
         );
 
 
 
 
 
-    gl_FragData[0] =
+    gl_FragData[0]
+        =
         vec4(
             color,
             1.0
         );
+
 
 }

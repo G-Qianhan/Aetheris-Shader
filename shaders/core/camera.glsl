@@ -3,17 +3,16 @@
 
 
 #include "/core/uniforms.glsl"
-
+#include "/core/common.glsl"
 
 
 // ===================================
-// Aetheris Camera Reconstruction
+// Aetheris Camera System
 // ===================================
 
 
 
-
-vec3 getViewPosition(
+vec3 AER_ReconstructViewPosition(
     vec2 uv,
     float depth
 )
@@ -27,12 +26,15 @@ vec3 getViewPosition(
         );
 
 
+
     vec4 view =
         gbufferProjectionInverse *
         clip;
 
 
+
     view /= view.w;
+
 
 
     return view.xyz;
@@ -43,17 +45,18 @@ vec3 getViewPosition(
 
 
 
-vec3 getWorldPosition(
+vec3 AER_ReconstructWorldPosition(
     vec2 uv,
     float depth
 )
 {
 
     vec3 view =
-        getViewPosition(
+        AER_ReconstructViewPosition(
             uv,
             depth
         );
+
 
 
     vec4 world =
@@ -64,7 +67,10 @@ vec3 getWorldPosition(
         );
 
 
-    return world.xyz;
+
+    return
+        world.xyz +
+        cameraPosition;
 
 }
 
@@ -72,13 +78,14 @@ vec3 getWorldPosition(
 
 
 
-vec3 getViewDirection(
-    vec3 viewPosition
+vec3 AER_ViewDirection(
+    vec3 worldPosition
 )
 {
 
-    return normalize(
-        -viewPosition
+    return AER_Normalize(
+        cameraPosition -
+        worldPosition
     );
 
 }
@@ -87,23 +94,49 @@ vec3 getViewDirection(
 
 
 
-float linearDepth(
-    float depth
+// ===================================
+// Sky Ray
+// ===================================
+
+
+vec3 AER_GetViewRay(
+    vec2 uv
 )
 {
 
-    vec3 pos =
-        getViewPosition(
-            vec2(0.5),
-            depth
+    vec4 clip =
+        vec4(
+            uv * 2.0 - 1.0,
+            1.0,
+            1.0
         );
 
 
-    return -pos.z;
+
+    vec4 view =
+        gbufferProjectionInverse *
+        clip;
+
+
+
+    view /= view.w;
+
+
+
+    vec4 world =
+        gbufferModelViewInverse *
+        vec4(
+            view.xyz,
+            0.0
+        );
+
+
+
+    return AER_Normalize(
+        world.xyz
+    );
 
 }
-
-
 
 
 

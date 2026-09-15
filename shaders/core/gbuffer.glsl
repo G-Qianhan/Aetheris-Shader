@@ -3,10 +3,16 @@
 
 
 #include "/core/uniforms.glsl"
+#include "/core/common.glsl"
+
+
+// ===================================
+// Aetheris GBuffer Reader
+// ===================================
 
 
 
-vec3 getAlbedo(
+vec3 AER_GetAlbedo(
     vec2 uv
 )
 {
@@ -22,21 +28,20 @@ vec3 getAlbedo(
 
 
 
-vec3 getNormal(
+vec3 AER_GetNormal(
     vec2 uv
 )
 {
 
-    vec3 n =
+    vec3 normal =
         texture2D(
             colortex1,
             uv
         ).rgb;
 
 
-
-    return normalize(
-        n * 2.0 - 1.0
+    return AER_Normalize(
+        normal * 2.0 - 1.0
     );
 
 }
@@ -44,7 +49,8 @@ vec3 getNormal(
 
 
 
-vec2 getLightmap(
+
+vec2 AER_GetLightmap(
     vec2 uv
 )
 {
@@ -60,7 +66,45 @@ vec2 getLightmap(
 
 
 
-float getDepth(
+int AER_GetMaterialID(
+    vec2 uv
+)
+{
+
+    return int(
+        texture2D(
+            colortex2,
+            uv
+        ).b
+        *
+        255.0
+    );
+
+}
+
+
+
+
+
+vec3 AER_GetWorldPosition(
+    vec2 uv
+)
+{
+
+    return texture2D(
+        colortex3,
+        uv
+    ).xyz
+    *
+    100.0;
+
+}
+
+
+
+
+
+float AER_GetDepth(
     vec2 uv
 )
 {

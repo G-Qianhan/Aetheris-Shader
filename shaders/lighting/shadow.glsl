@@ -2,20 +2,23 @@
 #define AETHERIS_SHADOW
 
 
+
 #include "/core/common.glsl"
 #include "/core/uniforms.glsl"
 
+
 #include "/lighting/shadow_filter.glsl"
+#include "/lighting/shadow_stabilization.glsl"
+
 
 
 // ===================================
-// Aetheris Shadow Engine v2
+// Aetheris Shadow Engine
 // ===================================
 
 
 
-
-vec3 worldToShadow(
+vec3 AER_WorldToShadow(
     vec3 worldPosition
 )
 {
@@ -29,16 +32,23 @@ vec3 worldToShadow(
         );
 
 
+
     shadowPosition.xyz /=
         shadowPosition.w;
 
 
-    return
-        shadowPosition.xyz
-        *
+
+    vec3 coord =
+        shadowPosition.xyz *
         0.5
         +
         0.5;
+
+
+
+    return AER_StabilizeShadowCoord(
+        coord
+    );
 
 }
 
@@ -46,14 +56,22 @@ vec3 worldToShadow(
 
 
 
-float shadowFade(
-    float distance
+float AER_ShadowDistanceFade(
+    vec3 worldPosition
 )
 {
 
+    float distance =
+        length(
+            cameraPosition -
+            worldPosition
+        );
+
+
+
     return clamp(
         1.0 -
-        distance / 180.0,
+        distance / 160.0,
         0.0,
         1.0
     );
@@ -64,14 +82,14 @@ float shadowFade(
 
 
 
-float calculateShadow(
+float AER_CalculateShadow(
     vec3 worldPosition
 )
 {
 
 
     vec3 coord =
-        worldToShadow(
+        AER_WorldToShadow(
             worldPosition
         );
 
@@ -95,14 +113,25 @@ float calculateShadow(
 
 
     float shadow =
-        PCF5x5(
+        AER_PCFShadow(
             coord
         );
 
 
 
+    float fade =
+        AER_ShadowDistanceFade(
+            worldPosition
+        );
 
-    return shadow;
+
+
+    return mix(
+        1.0,
+        shadow,
+        fade
+    );
+
 
 }
 

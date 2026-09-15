@@ -2,6 +2,7 @@
 #define AETHERIS_SUNLIGHT
 
 
+#include "/core/uniforms.glsl"
 #include "/core/common.glsl"
 
 
@@ -11,10 +12,10 @@
 
 
 
-vec3 getSunDirection()
+vec3 AER_GetSunDirection()
 {
 
-    return AER_SafeNormalize(
+    return normalize(
         sunPosition
     );
 
@@ -23,13 +24,13 @@ vec3 getSunDirection()
 
 
 
-vec3 getSunColor()
+vec3 AER_GetSunColor()
 {
 
     return vec3(
         1.0,
-        0.92,
-        0.78
+        0.96,
+        0.88
     );
 
 }
@@ -37,12 +38,21 @@ vec3 getSunColor()
 
 
 
-float getSunIntensity()
+float AER_SunIntensity()
 {
 
-    return 1.0;
+    float height =
+        clamp(
+            sunPosition.y,
+            0.0,
+            1.0
+        );
+
+
+    return height;
 
 }
+
 
 
 

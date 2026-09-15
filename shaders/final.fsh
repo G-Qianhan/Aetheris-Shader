@@ -1,7 +1,19 @@
 #version 120
 
 
-uniform sampler2D colortex0;
+// ===================================
+// Aetheris Final Output
+// ===================================
+
+
+#include "/core/uniforms.glsl"
+
+#include "/post/exposure.glsl"
+#include "/post/aces.glsl"
+#include "/post/bloom.glsl"
+#include "/post/color_grade.glsl"
+
+
 
 varying vec2 texcoord;
 
@@ -10,6 +22,7 @@ varying vec2 texcoord;
 void main()
 {
 
+
     vec3 color =
         texture2D(
             colortex0,
@@ -17,27 +30,54 @@ void main()
         ).rgb;
 
 
-    /*
-        Aetheris basic contrast
-    */
 
+    // HDR exposure
 
     color =
-        pow(
-            color,
-            vec3(1.0 / 2.2)
+        AER_Exposure(
+            color
         );
 
 
+
+    // Bloom
+
+    vec3 bloom =
+        AER_Bloom(
+            texcoord
+        );
+
+
+
+    color +=
+        bloom *
+        0.08;
+
+
+
+    // Tone mapping
+
     color =
-        (color - 0.5) * 1.08 + 0.5;
+        AER_ACES(
+            color
+        );
 
 
 
-    gl_FragData[0] =
+    // Color
+
+    color =
+        AER_ColorGrade(
+            color
+        );
+
+
+
+    gl_FragColor =
         vec4(
             color,
             1.0
         );
+
 
 }
