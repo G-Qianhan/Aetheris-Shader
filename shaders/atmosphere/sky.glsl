@@ -4,12 +4,10 @@
 
 #include "/core/common.glsl"
 
-#include "/atmosphere/clouds.glsl"
-
 
 
 // ===================================
-// Aetheris Sky
+// Aetheris Natural Sky
 // ===================================
 
 
@@ -20,7 +18,7 @@ vec3 AER_BaseSky(
 {
 
 
-    float h =
+    float height =
         clamp(
             direction.y * 0.5 + 0.5,
             0.0,
@@ -29,20 +27,24 @@ vec3 AER_BaseSky(
 
 
 
+    // 地平线
+
     vec3 horizon =
         vec3(
-            0.55,
             0.62,
-            0.72
+            0.68,
+            0.76
         );
 
 
 
+    // 天顶
+
     vec3 zenith =
         vec3(
-            0.16,
-            0.30,
-            0.58
+            0.22,
+            0.38,
+            0.65
         );
 
 
@@ -50,7 +52,7 @@ vec3 AER_BaseSky(
     return mix(
         horizon,
         zenith,
-        h
+        height
     );
 
 }
@@ -58,29 +60,23 @@ vec3 AER_BaseSky(
 
 
 
-
-vec3 AER_SunDisk(
+vec3 AER_SunSkyGlow(
     vec3 direction,
     vec3 sunDirection
 )
 {
 
-
-    float sun =
-        dot(
-            direction,
-            sunDirection
+    float glow =
+        pow(
+            max(
+                dot(
+                    direction,
+                    sunDirection
+                ),
+                0.0
+            ),
+            256.0
         );
-
-
-
-    float disk =
-        smoothstep(
-            0.9995,
-            1.0,
-            sun
-        );
-
 
 
     return vec3(
@@ -89,12 +85,11 @@ vec3 AER_SunDisk(
         0.65
     )
     *
-    disk
+    glow
     *
-    4.0;
+    0.35;
 
 }
-
 
 
 
@@ -106,7 +101,6 @@ vec3 AER_RenderSky(
 )
 {
 
-
     vec3 sky =
         AER_BaseSky(
             direction
@@ -115,7 +109,7 @@ vec3 AER_RenderSky(
 
 
     sky +=
-        AER_SunDisk(
+        AER_SunSkyGlow(
             direction,
             sunDirection
         );

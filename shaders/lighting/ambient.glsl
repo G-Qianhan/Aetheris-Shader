@@ -3,16 +3,21 @@
 
 
 #include "/core/common.glsl"
+#include "/core/uniforms.glsl"
 
 
 
 /*
-    Sky ambient
+    Aetheris Ambient Lighting
+
+    Environment illumination
 
     后续接:
-    sky scattering
-    weather
-    time
+    - sky scattering
+    - weather
+    - time cycle
+    - moon light
+
 */
 
 
@@ -21,9 +26,9 @@ vec3 AER_GetAmbientSky()
 {
 
     return vec3(
-        0.10,
-        0.13,
-        0.20
+        0.38,
+        0.40,
+        0.42
     );
 
 }
@@ -36,9 +41,17 @@ vec3 AER_CalculateAmbient(
 )
 {
 
+
+    vec3 ambient =
+        AER_GetAmbientSky();
+
+
+
     return
         albedo *
-        AER_GetAmbientSky();
+        ambient *
+        0.65;
+
 
 }
 

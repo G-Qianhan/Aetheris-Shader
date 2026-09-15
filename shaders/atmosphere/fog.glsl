@@ -2,13 +2,8 @@
 #define AETHERIS_FOG
 
 
+
 #include "/core/common.glsl"
-
-
-
-// ===================================
-// Aetheris Atmospheric Fog
-// ===================================
 
 
 
@@ -20,7 +15,7 @@ float AER_FogFactor(
     return 1.0 -
         exp(
             -distance *
-            0.0025
+            0.0008
         );
 
 }
@@ -42,10 +37,11 @@ vec3 AER_ApplyFog(
         );
 
 
+
     return mix(
         color,
         fogColor,
-        fog
+        fog * 0.35
     );
 
 }
