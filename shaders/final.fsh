@@ -1,25 +1,27 @@
 #version 120
 
-/*
-    Aetheris Shader
-    First Color Pipeline
-*/
-
 uniform sampler2D colortex0;
 
 varying vec2 texcoord;
 
 
+#include "/core/config.glsl"
+#include "/post/color_grade.glsl"
+
+
 void main()
 {
-    // Get original Minecraft image
-    vec3 color = texture2D(colortex0, texcoord).rgb;
+
+    vec3 color =
+    texture2D(colortex0, texcoord).rgb;
 
 
-    // Aetheris signature tone
-    // Slightly cooler cinematic color
-    color *= vec3(1.02, 1.03, 1.06);
+    color =
+    AetherisColorGrade(color);
 
 
-    gl_FragData[0] = vec4(color, 1.0);
+    gl_FragData[0]
+    =
+    vec4(color,1.0);
+
 }
