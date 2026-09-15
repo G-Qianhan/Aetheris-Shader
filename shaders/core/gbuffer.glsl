@@ -5,13 +5,10 @@
 #include "/core/uniforms.glsl"
 
 
-// ===================================
-// Aetheris GBuffer Reader
-// ===================================
 
-
-
-vec3 getAlbedo(vec2 uv)
+vec3 getAlbedo(
+    vec2 uv
+)
 {
 
     return texture2D(
@@ -25,7 +22,9 @@ vec3 getAlbedo(vec2 uv)
 
 
 
-vec3 getNormal(vec2 uv)
+vec3 getNormal(
+    vec2 uv
+)
 {
 
     vec3 n =
@@ -33,6 +32,7 @@ vec3 getNormal(vec2 uv)
             colortex1,
             uv
         ).rgb;
+
 
 
     return normalize(
@@ -44,8 +44,25 @@ vec3 getNormal(vec2 uv)
 
 
 
+vec2 getLightmap(
+    vec2 uv
+)
+{
 
-float getDepth(vec2 uv)
+    return texture2D(
+        colortex2,
+        uv
+    ).rg;
+
+}
+
+
+
+
+
+float getDepth(
+    vec2 uv
+)
 {
 
     return texture2D(
@@ -54,26 +71,6 @@ float getDepth(vec2 uv)
     ).r;
 
 }
-
-
-
-
-
-float isSky(vec2 uv)
-{
-
-    float depth =
-        getDepth(uv);
-
-
-    return step(
-        0.99999,
-        depth
-    );
-
-}
-
-
 
 
 

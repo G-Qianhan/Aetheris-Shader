@@ -2,21 +2,14 @@
 #define AETHERIS_DIRECT_LIGHT
 
 
-// ===================================
-// Aetheris Shader
-// Direct Lighting Model
-// ===================================
-
-
-
 #include "/core/common.glsl"
 
 
+// ===================================
+// Aetheris Direct Lighting
+// ===================================
 
 
-// -----------------------------------
-// Lambert Diffuse
-// -----------------------------------
 
 float diffuseLambert(
     vec3 normal,
@@ -37,11 +30,6 @@ float diffuseLambert(
 
 
 
-
-// -----------------------------------
-// Blinn-Phong Specular
-// -----------------------------------
-
 float specularBlinn(
     vec3 normal,
     vec3 viewDirection,
@@ -51,7 +39,7 @@ float specularBlinn(
 {
 
     vec3 halfVector =
-        safeNormalize(
+        AER_SafeNormalize(
             viewDirection +
             lightDirection
         );
@@ -85,11 +73,6 @@ float specularBlinn(
 
 
 
-
-// -----------------------------------
-// Direct Sun Light
-// -----------------------------------
-
 vec3 calculateDirectLight(
     vec3 albedo,
     vec3 normal,
@@ -99,7 +82,6 @@ vec3 calculateDirectLight(
     float roughness
 )
 {
-
 
     float diffuse =
         diffuseLambert(
@@ -137,8 +119,6 @@ vec3 calculateDirectLight(
         specularLight;
 
 }
-
-
 
 
 

@@ -1,6 +1,14 @@
 #version 120
 
 
+// ===================================
+// Aetheris Shader
+// Deferred Lighting Composite
+// ===================================
+
+
+#include "/core/common.glsl"
+#include "/core/uniforms.glsl"
 #include "/core/gbuffer.glsl"
 #include "/core/camera.glsl"
 
@@ -17,12 +25,13 @@ varying vec2 texcoord;
 
 
 
+
 void main()
 {
 
-    // ----------------------------
-    // Read GBuffer
-    // ----------------------------
+    // ==============================
+    // GBuffer Data
+    // ==============================
 
 
     vec3 albedo =
@@ -44,9 +53,30 @@ void main()
 
 
 
-    // ----------------------------
-    // Position reconstruction
-    // ----------------------------
+    // ==============================
+    // Sky Pass Protection
+    // ==============================
+
+
+    if(depth >= 0.99999)
+    {
+
+        gl_FragData[0] =
+            vec4(
+                albedo,
+                1.0
+            );
+
+        return;
+
+    }
+
+
+
+
+    // ==============================
+    // Position Reconstruction
+    // ==============================
 
 
     vec3 worldPosition =
@@ -58,15 +88,17 @@ void main()
 
 
     vec3 viewDirection =
-        safeNormalize(
+        AER_SafeNormalize(
             -worldPosition
         );
 
 
 
-    // ----------------------------
-    // Lighting
-    // ----------------------------
+
+
+    // ==============================
+    // Sun Lighting
+    // ==============================
 
 
     vec3 sunDirection =
@@ -79,8 +111,7 @@ void main()
 
 
 
-
-    vec3 direct =
+    vec3 directLight =
         calculateDirectLight(
             albedo,
             normal,
@@ -92,11 +123,25 @@ void main()
 
 
 
-    vec3 ambient =
+
+
+    // ==============================
+    // Ambient
+    // ==============================
+
+
+    vec3 ambientLight =
         calculateAmbient(
             albedo
         );
 
+
+
+
+
+    // ==============================
+    // Shadow
+    // ==============================
 
 
     float shadow =
@@ -106,6 +151,49 @@ void main()
 
 
 
+
+
+    // ==============================
+    // Minecraft Lightmap
+    // ==============================
+
+
+    vec2 lightmap =
+        getLightmap(
+            texcoord
+        );
+
+
+    vec3 blockLight =
+        vec3(
+            lightmap.x,
+            lightmap.x * 0.75,
+            lightmap.x * 0.45
+        );
+
+
+    vec3 skyLight =
+        vec3(
+            lightmap.y * 0.45,
+            lightmap.y * 0.55,
+            lightmap.y * 0.75
+        );
+
+
+
+    vec3 minecraftLight =
+        blockLight +
+        skyLight;
+
+
+
+
+
+    // ==============================
+    // Ambient Occlusion
+    // ==============================
+
+
     float ao =
         calculateAO(
             texcoord
@@ -113,14 +201,35 @@ void main()
 
 
 
+
+
+    // ==============================
+    // Final Lighting Combine
+    // ==============================
+
+
     vec3 color =
-        ambient
+        ambientLight
         +
-        direct * shadow;
+        directLight * shadow
+        +
+        minecraftLight;
 
 
 
     color *= ao;
+
+
+
+    // 防止过暗
+
+    color =
+        max(
+            color,
+            vec3(0.001)
+        );
+
+
 
 
 

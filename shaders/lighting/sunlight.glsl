@@ -3,18 +3,23 @@
 
 
 #include "/core/common.glsl"
-#include "/core/uniforms.glsl"
+
+
+// ===================================
+// Aetheris Sun System
+// ===================================
 
 
 
 vec3 getSunDirection()
 {
 
-    return safeNormalize(
+    return AER_SafeNormalize(
         sunPosition
     );
 
 }
+
 
 
 
@@ -28,6 +33,7 @@ vec3 getSunColor()
     );
 
 }
+
 
 
 

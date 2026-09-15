@@ -5,6 +5,12 @@
 #include "/core/common.glsl"
 #include "/core/uniforms.glsl"
 
+#include "/lighting/shadow_filter.glsl"
+
+
+// ===================================
+// Aetheris Shadow Engine v2
+// ===================================
 
 
 
@@ -28,7 +34,9 @@ vec3 worldToShadow(
 
 
     return
-        shadowPosition.xyz * 0.5
+        shadowPosition.xyz
+        *
+        0.5
         +
         0.5;
 
@@ -38,34 +46,17 @@ vec3 worldToShadow(
 
 
 
-float shadowCompare(
-    vec3 shadowCoord
+float shadowFade(
+    float distance
 )
 {
 
-    float depth =
-        texture2D(
-            shadowtex0,
-            shadowCoord.xy
-        ).r;
-
-
-
-    float current =
-        shadowCoord.z;
-
-
-
-    if(
-        current - 0.002 >
-        depth
-    )
-    {
-        return 0.0;
-    }
-
-
-    return 1.0;
+    return clamp(
+        1.0 -
+        distance / 180.0,
+        0.0,
+        1.0
+    );
 
 }
 
@@ -77,6 +68,7 @@ float calculateShadow(
     vec3 worldPosition
 )
 {
+
 
     vec3 coord =
         worldToShadow(
@@ -94,14 +86,23 @@ float calculateShadow(
         coord.z > 1.0
     )
     {
+
         return 1.0;
+
     }
 
 
 
-    return shadowCompare(
-        coord
-    );
+
+    float shadow =
+        PCF5x5(
+            coord
+        );
+
+
+
+
+    return shadow;
 
 }
 

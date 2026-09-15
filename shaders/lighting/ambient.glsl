@@ -2,29 +2,19 @@
 #define AETHERIS_AMBIENT
 
 
-// ===================================
-// Aetheris Ambient Lighting
-// ===================================
-
-
 #include "/core/common.glsl"
-
-
-
 
 
 vec3 getAmbientColor()
 {
 
     return vec3(
-        0.35,
-        0.42,
-        0.55
+        0.08,
+        0.10,
+        0.15
     );
 
 }
-
-
 
 
 
@@ -38,8 +28,6 @@ vec3 calculateAmbient(
         getAmbientColor();
 
 }
-
-
 
 
 

@@ -5,6 +5,9 @@ varying vec2 texcoord;
 varying vec4 vertexColor;
 varying vec3 normal;
 
+varying vec2 lightmapCoord;
+
+
 
 void main()
 {
@@ -13,12 +16,20 @@ void main()
         ftransform();
 
 
+
     texcoord =
         gl_MultiTexCoord0.xy;
 
 
+
+    lightmapCoord =
+        gl_MultiTexCoord1.xy;
+
+
+
     vertexColor =
         gl_Color;
+
 
 
     normal =

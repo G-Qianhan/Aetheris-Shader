@@ -2,39 +2,40 @@
 #define AETHERIS_COMMON
 
 
-// ===================================
-// Aetheris Shader
-// Common Functions
-// ===================================
+#define AER_PI 3.14159265359
 
 
 
-#define PI 3.14159265359
-
-
-
-// -----------------------------
-// Clamp 0-1
-// -----------------------------
-
-float saturate(float x)
+float AER_Saturate(
+    float x
+)
 {
-    return clamp(x,0.0,1.0);
-}
-
-
-vec3 saturate(vec3 x)
-{
-    return clamp(x,0.0,1.0);
+    return clamp(
+        x,
+        0.0,
+        1.0
+    );
 }
 
 
 
-// -----------------------------
-// Luminance
-// -----------------------------
+vec3 AER_Saturate(
+    vec3 x
+)
+{
+    return clamp(
+        x,
+        0.0,
+        1.0
+    );
+}
 
-float luminance(vec3 color)
+
+
+
+float AER_Luminance(
+    vec3 color
+)
 {
     return dot(
         color,
@@ -48,23 +49,27 @@ float luminance(vec3 color)
 
 
 
-// -----------------------------
-// Gamma
-// -----------------------------
 
-vec3 linearToSRGB(vec3 color)
+
+vec3 AER_LinearToSRGB(
+    vec3 color
+)
 {
     return pow(
         color,
         vec3(
-            1.0/2.2
+            1.0 / 2.2
         )
     );
 }
 
 
 
-vec3 sRGBToLinear(vec3 color)
+
+
+vec3 AER_SRGBToLinear(
+    vec3 color
+)
 {
     return pow(
         color,
@@ -76,20 +81,24 @@ vec3 sRGBToLinear(vec3 color)
 
 
 
-// -----------------------------
-// Safe normalize
-// -----------------------------
 
-vec3 safeNormalize(vec3 v)
+
+vec3 AER_SafeNormalize(
+    vec3 v
+)
 {
 
     float len =
         length(v);
 
 
-    if(len < 0.0001)
+    if(len < 0.00001)
     {
-        return vec3(0.0,1.0,0.0);
+        return vec3(
+            0.0,
+            1.0,
+            0.0
+        );
     }
 
 

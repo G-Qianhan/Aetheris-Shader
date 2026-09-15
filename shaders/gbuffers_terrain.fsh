@@ -8,9 +8,13 @@ varying vec2 texcoord;
 varying vec4 vertexColor;
 varying vec3 normal;
 
+varying vec2 lightmapCoord;
+
+
 
 void main()
 {
+
 
     vec4 color =
         texture2D(
@@ -19,7 +23,9 @@ void main()
         );
 
 
+
     color *= vertexColor;
+
 
 
     if(color.a < 0.1)
@@ -28,33 +34,40 @@ void main()
     }
 
 
-    // Base color
 
-    gl_FragData[0] =
+
+    gl_FragData[0]
+        =
         color;
 
 
-    // Normal buffer
+
 
     vec3 n =
-        normalize(normal);
+        normalize(
+            normal
+        );
 
 
-    gl_FragData[1] =
+
+    gl_FragData[1]
+        =
         vec4(
             n * 0.5 + 0.5,
             1.0
         );
 
 
-    // Material mask
 
-    gl_FragData[2] =
+
+    gl_FragData[2]
+        =
         vec4(
-            1.0,
-            0.0,
+            lightmapCoord,
             0.0,
             1.0
         );
+
+
 
 }
