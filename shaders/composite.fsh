@@ -1,101 +1,126 @@
 #version 120
 
 
-uniform sampler2D colortex0;
-uniform sampler2D colortex1;
-uniform sampler2D colortex2;
+#include "/core/gbuffer.glsl"
+#include "/core/camera.glsl"
+
+
+#include "/lighting/direct_light.glsl"
+#include "/lighting/sunlight.glsl"
+#include "/lighting/ambient.glsl"
+#include "/lighting/shadow.glsl"
+#include "/lighting/ao.glsl"
+
 
 
 varying vec2 texcoord;
 
 
+
 void main()
 {
 
-    vec3 color =
-        texture2D(
-            colortex0,
+    // ----------------------------
+    // Read GBuffer
+    // ----------------------------
+
+
+    vec3 albedo =
+        getAlbedo(
             texcoord
-        ).rgb;
+        );
 
 
     vec3 normal =
-        texture2D(
-            colortex1,
+        getNormal(
             texcoord
-        ).rgb;
+        );
 
 
-    float material =
-        texture2D(
-            colortex2,
+    float depth =
+        getDepth(
             texcoord
-        ).r;
-
-
-
-    /*
-        Aetheris Base Lighting
-
-        注意：
-        这里只处理 terrain
-    */
-
-
-    normal =
-        normal * 2.0 - 1.0;
-
-
-
-    vec3 sun =
-        normalize(
-            vec3(
-                0.4,
-                0.8,
-                0.3
-            )
         );
 
 
 
-    float diffuse =
-        max(
-            dot(
-                normal,
-                sun
-            ),
-            0.0
+    // ----------------------------
+    // Position reconstruction
+    // ----------------------------
+
+
+    vec3 worldPosition =
+        reconstructWorldPosition(
+            texcoord,
+            depth
         );
 
 
 
-    float ambient =
-        0.45;
-
-
-
-    float lighting =
-        ambient +
-        diffuse * 0.55;
-
-
-
-    color =
-        mix(
-            color,
-            color * lighting,
-            material
+    vec3 viewDirection =
+        safeNormalize(
+            -worldPosition
         );
 
 
 
-    /*
-        Architectural color grade
-    */
+    // ----------------------------
+    // Lighting
+    // ----------------------------
 
 
-    color.r *= 1.03;
-    color.b *= 0.98;
+    vec3 sunDirection =
+        getSunDirection();
+
+
+
+    vec3 sunColor =
+        getSunColor();
+
+
+
+
+    vec3 direct =
+        calculateDirectLight(
+            albedo,
+            normal,
+            viewDirection,
+            sunDirection,
+            sunColor,
+            0.8
+        );
+
+
+
+    vec3 ambient =
+        calculateAmbient(
+            albedo
+        );
+
+
+
+    float shadow =
+        calculateShadow(
+            worldPosition
+        );
+
+
+
+    float ao =
+        calculateAO(
+            texcoord
+        );
+
+
+
+    vec3 color =
+        ambient
+        +
+        direct * shadow;
+
+
+
+    color *= ao;
 
 
 

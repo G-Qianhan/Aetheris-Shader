@@ -1,15 +1,46 @@
-/*
-    Aetheris Shader
-    Ambient Lighting
-*/
+#ifndef AETHERIS_AMBIENT
+#define AETHERIS_AMBIENT
 
 
-vec3 AetherisAmbient(
-    vec3 color,
-    float strength
+// ===================================
+// Aetheris Ambient Lighting
+// ===================================
+
+
+#include "/core/common.glsl"
+
+
+
+
+
+vec3 getAmbientColor()
+{
+
+    return vec3(
+        0.35,
+        0.42,
+        0.55
+    );
+
+}
+
+
+
+
+
+vec3 calculateAmbient(
+    vec3 albedo
 )
 {
 
-    return color * strength;
+    return
+        albedo *
+        getAmbientColor();
 
 }
+
+
+
+
+
+#endif
